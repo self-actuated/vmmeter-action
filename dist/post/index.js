@@ -28906,6 +28906,14 @@ function wrappy (fn, cb) {
 
 /***/ }),
 
+/***/ 7084:
+/***/ ((module) => {
+
+module.exports = eval("require")("axios");
+
+
+/***/ }),
+
 /***/ 9491:
 /***/ ((module) => {
 
@@ -30792,11 +30800,25 @@ var __webpack_exports__ = {};
 (() => {
 const core = __nccwpck_require__(2619);
 const github = __nccwpck_require__(4637);
+const axios = __nccwpck_require__(7084)
+
+const VMMETER_PID = 'vmmeter-pid'
+const VMMETER_PORT = 'vmmeter-port'
 
 try {
   // `who-to-greet` input defined in action metadata file
   const nameToGreet = core.getInput('who-to-greet');
   console.log(`Thanks ${nameToGreet}!`);
+
+  let vmPort = core.getState('vmmeter-port')
+
+  axios({"method": "get", "url": `http://127.0.0.1:${vmPort}/metrics`, "headers": {}}).
+  then((response) => {
+    console.log(response.data)
+  }).
+  catch(err => {
+    console.log(err)
+  })
  
 } catch (error) {
   core.setFailed(error.message);

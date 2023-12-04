@@ -30810,8 +30810,8 @@ const external_child_process_namespaceObject = require("child_process");
 ;// CONCATENATED MODULE: ./index.js
 const core = __nccwpck_require__(2619);
 const github = __nccwpck_require__(4637);
-
-
+const fs = __nccwpck_require__(7147)
+;
 
 const VMMETER_PID = 'vmmeter-pid'
 const VMMETER_PORT = 'vmmeter-port'
@@ -30845,14 +30845,19 @@ try {
   console.log(`vmmeter pid: ${child.pid}`)
 
   for( let i = 0; i < 100; i++ ) {
+    let out = false
     fs.readFileSync('/tmp/vmmeter.port', 'utf8', function(err, data) {
       if(!err) {
         console.log("Port: " + data)
 
-        core.saveState(VMMETER_PID, data.trim())
+        core.saveState(VMMETER_PORT, data.trim())
+        out = true
       }
     });
-    
+
+    if(out) {
+      break
+    }
   }
 
 } catch (error) {

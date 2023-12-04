@@ -1,6 +1,6 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
-
+const fs = require('fs')
 import { ChildProcess, spawn, exec } from 'child_process'
 
 const VMMETER_PID = 'vmmeter-pid'
