@@ -37447,7 +37447,7 @@ try {
     throw new Error("vmmeter port not found")
   }
 
-  axios({"method": "get", "url": `http://127.0.0.1:${vmPort}/metrics`, "headers": {}}).
+  axios({"method": "get", "url": `http://127.0.0.1:${vmPort}/collect`, "headers": {}}).
   then((response) => {
     console.log(response.data)
   }).
