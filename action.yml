@@ -1,13 +1,11 @@
 name: 'Hello World'
 description: 'Greet someone and record the time'
 inputs:
-  who-to-greet:  # id of input
-    description: 'Who to greet'
-    required: true
-    default: 'World'
 outputs:
-  time: # id of output
-    description: 'The time we greeted you'
+  start-time: # id of output
+    description: 'Start time of metering'
+  end-time: # id of output
+    description: 'End time of metering'
 runs:
   using: 'node20'
   main: 'dist/main/index.js'

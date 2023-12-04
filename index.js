@@ -1,17 +1,14 @@
 const core = require('@actions/core');
-const github = require('@actions/github');
 const fs = require('fs')
-import { ChildProcess, execSync, spawn, exec } from 'child_process'
+import { execSync, spawn } from 'child_process'
 
 const VMMETER_PID = 'vmmeter-pid'
 const VMMETER_PORT = 'vmmeter-port'
 
 try {
-  // `who-to-greet` input defined in action metadata file
-  const nameToGreet = core.getInput('who-to-greet');
-  console.log(`Hello ${nameToGreet}!`);
+
   const time = (new Date()).toTimeString();
-  core.setOutput("time", time);
+  core.setOutput("start-time", time);
  
   const child = spawn(
     'sudo',
