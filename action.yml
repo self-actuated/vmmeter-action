@@ -1,5 +1,10 @@
-name: 'Hello World'
-description: 'Greet someone and record the time'
+name: 'vmmeter-action'
+description: 'Meter CPU load and RAM for a job'
+inputs:
+  createSummary: # id of input
+    description: 'Print summary of metering'
+    required: false
+    default: 'true'
 outputs:
   start-time: # id of output
     description: 'Start time of metering'

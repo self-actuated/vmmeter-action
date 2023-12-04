@@ -33231,29 +33231,44 @@ const axios = __nccwpck_require__(9707)
 const VMMETER_PID = 'vmmeter-pid'
 const VMMETER_PORT = 'vmmeter-port'
 
-try {
-  const time = (new Date()).toTimeString();
-  core.setOutput("end-time", time);
+async function run() {
 
-  let vmPort = core.getState('vmmeter-port')
-
-  if(vmPort == '') {
-    throw new Error("vmmeter port not found")
+  try {
+    const time = (new Date()).toTimeString();
+    core.setOutput("end-time", time);
+  
+    let vmPort = core.getState('vmmeter-port')
+  
+    if(vmPort == '') {
+      throw new Error("vmmeter port not found")
+    }
+  
+    let results = ""
+    await axios({"method": "get", "url": `http://127.0.0.1:${vmPort}/collect`, "headers": {}}).
+    then((response) => {
+      console.log(response.data)
+      results = response.data
+    }).
+    catch(err => {
+      console.log(err)
+      core.setFailed(`Failed to collect metrics: ${err.message}`);
+    })
+  
+    if(core.getBooleanInput("createSummary")){
+  
+      await core.summary
+      .addHeading('Metering Results')
+      .addCodeBlock(results, "text")
+      .write()
+    }
+   
+  } catch (error) {
+    core.setFailed(error.message);
   }
-
-  axios({"method": "get", "url": `http://127.0.0.1:${vmPort}/collect`, "headers": {}}).
-  then((response) => {
-    console.log(response.data)
-  }).
-  catch(err => {
-    console.log(err)
-    core.setFailed(`Failed to collect metrics: ${err.message}`);
-  })
- 
-} catch (error) {
-  core.setFailed(error.message);
+  
 }
 
+run()
 })();
 
 module.exports = __webpack_exports__;
