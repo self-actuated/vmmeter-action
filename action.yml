@@ -1,6 +1,5 @@
 name: 'Hello World'
 description: 'Greet someone and record the time'
-inputs:
 outputs:
   start-time: # id of output
     description: 'Start time of metering'
