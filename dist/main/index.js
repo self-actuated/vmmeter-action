@@ -30822,9 +30822,6 @@ try {
   console.log(`Hello ${nameToGreet}!`);
   const time = (new Date()).toTimeString();
   core.setOutput("time", time);
-  // Get the JSON webhook payload for the event that triggered the workflow
-  const payload = JSON.stringify(github.context.payload, undefined, 2)
-  console.log(`The event payload: ${payload}`);
  
   const child = (0,external_child_process_namespaceObject.spawn)(
     'sudo',
@@ -30858,6 +30855,8 @@ try {
     if(out) {
       break
     }
+    (0,external_child_process_namespaceObject.execSync)('sleep 0.1'); // block process for 1 second.
+    // add a 100ms sleep
   }
 
 } catch (error) {
