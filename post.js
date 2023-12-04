@@ -22,6 +22,7 @@ try {
   }).
   catch(err => {
     console.log(err)
+    core.setFailed(`Failed to collect metrics: ${err.message}`);
   })
  
 } catch (error) {
