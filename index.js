@@ -1,7 +1,7 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
 const fs = require('fs')
-import { ChildProcess, spawn, exec } from 'child_process'
+import { ChildProcess, execSync, spawn, exec } from 'child_process'
 
 const VMMETER_PID = 'vmmeter-pid'
 const VMMETER_PORT = 'vmmeter-port'
@@ -12,9 +12,6 @@ try {
   console.log(`Hello ${nameToGreet}!`);
   const time = (new Date()).toTimeString();
   core.setOutput("time", time);
-  // Get the JSON webhook payload for the event that triggered the workflow
-  const payload = JSON.stringify(github.context.payload, undefined, 2)
-  console.log(`The event payload: ${payload}`);
  
   const child = spawn(
     'sudo',
@@ -48,6 +45,8 @@ try {
     if(out) {
       break
     }
+    execSync('sleep 0.1'); // block process for 1 second.
+    // add a 100ms sleep
   }
 
 } catch (error) {
