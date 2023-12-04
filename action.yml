@@ -10,4 +10,6 @@ outputs:
     description: 'The time we greeted you'
 runs:
   using: 'node20'
-  main: 'dist/index.js'
+  main: 'dist/main/index.js'
+  post: 'dist/post/post.js'
+
