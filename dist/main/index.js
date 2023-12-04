@@ -30782,16 +30782,39 @@ module.exports = parseParams
 /******/ 	}
 /******/ 	
 /************************************************************************/
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__nccwpck_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/compat */
 /******/ 	
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
+// This entry need to be wrapped in an IIFE because it need to be in strict mode.
 (() => {
+"use strict";
+// ESM COMPAT FLAG
+__nccwpck_require__.r(__webpack_exports__);
+
+;// CONCATENATED MODULE: external "child_process"
+const external_child_process_namespaceObject = require("child_process");
+;// CONCATENATED MODULE: ./index.js
 const core = __nccwpck_require__(2619);
 const github = __nccwpck_require__(4637);
+
+
+
+const VMMETER_PID = 'vmmeter-pid'
+const VMMETER_PORT = 'vmmeter-port'
 
 try {
   // `who-to-greet` input defined in action metadata file
@@ -30802,6 +30825,36 @@ try {
   // Get the JSON webhook payload for the event that triggered the workflow
   const payload = JSON.stringify(github.context.payload, undefined, 2)
   console.log(`The event payload: ${payload}`);
+ 
+  const child = (0,external_child_process_namespaceObject.spawn)(
+    'sudo',
+    [
+      "/usr/local/bin/vmmeter",
+    ],
+    {
+      detached: true,
+      stdio: 'ignore',
+      env: {
+        ...process.env
+      }
+    }
+  )
+  child.unref()
+
+  core.saveState(VMMETER_PID, child.pid?.toString())
+  console.log(`vmmeter pid: ${child.pid}`)
+
+  for( let i = 0; i < 100; i++ ) {
+    fs.readFileSync('/tmp/vmmeter.port', 'utf8', function(err, data) {
+      if(!err) {
+        console.log("Port: " + data)
+
+        core.saveState(VMMETER_PID, data.trim())
+      }
+    });
+    
+  }
+
 } catch (error) {
   core.setFailed(error.message);
 }
