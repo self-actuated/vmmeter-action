@@ -30846,14 +30846,14 @@ try {
 
   for( let i = 0; i < 100; i++ ) {
     let out = false
-    fs.readFileSync('/tmp/vmmeter.port', 'utf8', function(err, data) {
-      if(!err) {
-        console.log("Port: " + data)
+    try {
+      const data = fs.readFileSync('/tmp/vmmeter.port', 'utf8')
+      console.log("Port: " + data)
+      core.saveState(VMMETER_PORT, data.trim())
+      out = true
+    } catch {
 
-        core.saveState(VMMETER_PORT, data.trim())
-        out = true
-      }
-    });
+    }
 
     if(out) {
       break
