@@ -33257,9 +33257,8 @@ async function run() {
         console.log(err)
         core.setFailed(`Failed to collect metrics: ${err.message}, logs: ${data}`);
       } catch {
-        console.error("Failed to read log file: /tmp/vmmeter.log")
+        core.setFailed(`Failed to collect metrics: ${err.message}, logs: (can't read from /tmp/vmmeter.log)`);
       }
-
     })
   
     if(core.getBooleanInput("createSummary")){
