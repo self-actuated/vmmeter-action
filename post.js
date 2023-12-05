@@ -25,6 +25,14 @@ async function run() {
     catch(err => {
       console.log(err)
       core.setFailed(`Failed to collect metrics: ${err.message}`);
+
+      try {
+        data = fs.readFileSync('/tmp/vmmeter.log', 'utf8')
+        console.err(data)
+      } catch {
+        console.err("Failed to read log file: /tmp/vmmeter.log")
+      }
+
     })
   
     if(core.getBooleanInput("createSummary")){
