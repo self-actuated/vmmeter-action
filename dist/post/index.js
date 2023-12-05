@@ -33255,9 +33255,9 @@ async function run() {
 
       try {
         data = fs.readFileSync('/tmp/vmmeter.log', 'utf8')
-        console.err(data)
+        console.error(data)
       } catch {
-        console.err("Failed to read log file: /tmp/vmmeter.log")
+        console.error("Failed to read log file: /tmp/vmmeter.log")
       }
 
     })
