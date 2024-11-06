@@ -14,6 +14,8 @@ See also: [Right sizing VMs for GitHub Actions](https://actuated.com/blog/right-
         - uses: self-actuated/vmmeter-action@master
 ```
 
+The `alexellis/setup-arkade` action is required to install arkade, which is used to download the vmmeter binary used by `vmmeter-action`.
+
 ## Inputs via `with`:
 
 * `createSummary` - defaults to `true` and adds the results to the job summary, if set to false, the results will be printed to the console only.
