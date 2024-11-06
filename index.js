@@ -38,7 +38,7 @@ function run() {
 
     try {
       let data = fs.readFileSync('/tmp/vmmeter.log', 'utf8')
-      core.warning(`Error starting vmmeter, logs: {data}`)
+      core.warning(`Error starting vmmeter, logs: ${data}`)
     } catch {
       core.warning(`No logs found in /tmp/vmmeter.log`);
     }
@@ -68,15 +68,15 @@ function run() {
   }
 
   if(port > 0) {
-    console.log(`vmmeter port: ${data}`)
+    console.log(`vmmeter port: ${port}`)
 
-    core.saveState(VMMETER_PORT, data.trim())
+    core.saveState(VMMETER_PORT, port)
   } else {
     core.warning("vmmeter port not found, process did not start correctly");
 
     try {
       let data = fs.readFileSync('/tmp/vmmeter.log', 'utf8')
-      core.warning(`Error starting vmmeter, logs: {data}`)
+      core.warning(`Error starting vmmeter, logs: ${data}`)
     } catch {
       core.warning(`No logs found in /tmp/vmmeter.log`);
     }
