@@ -33240,7 +33240,18 @@ async function run() {
     let vmPort = core.getState('vmmeter-port')
   
     if(vmPort == '') {
-      core.warning("vmmeter port not found");
+
+      let logs = ""
+      try {
+        logs = fs.readFileSync('/tmp/vmmeter.log', 'utf8')
+      } catch {
+      }
+
+      core.warning(`vmmeter port not found in state`);
+      if(logs.length) {
+        core.warning(`Logs from /tmp/vmmeter.log: ${logs}`);
+      }
+
       return;
     }
   
@@ -33254,12 +33265,11 @@ async function run() {
 
       try {
         let data = fs.readFileSync('/tmp/vmmeter.log', 'utf8')
-        console.error(data)
-        console.log(err)
         core.warning(`Failed to collect metrics: ${err.message}, logs: ${data}`);
       } catch {
-        core.warning(`Failed to collect metrics: ${err.message}, logs: (can't read from /tmp/vmmeter.log)`);
+        core.warning(`Failed to collect metrics: ${err.message}, no logs at: /tmp/vmmeter.log)`);
       }
+
     })
   
     if(core.getBooleanInput("createSummary")) {
