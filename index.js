@@ -44,7 +44,7 @@ function run() {
     let out = false
     try {
       const data = fs.readFileSync('/tmp/vmmeter.port', 'utf8')
-      console.log(`Read port {data} from: /tmp/vmmeter.port`)
+      console.log(`vmmeter port: ${data}`)
       core.saveState(VMMETER_PORT, data.trim())
       out = true
     } catch {
