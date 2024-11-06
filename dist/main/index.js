@@ -26615,7 +26615,15 @@ function run() {
 
   const time = (new Date()).toTimeString();
   core.setOutput("start-time", time);
- 
+
+  // Fail if installation skipped
+  try {
+    fs.accessSync('/usr/local/bin/vmmeter', fs.constants.X_OK);
+  } catch (err) {
+    core.setFailed("vmmeter not found in /usr/local/bin, install via arkade");
+    return;
+  }
+   
   const child = (0,external_child_process_namespaceObject.spawn)(
     'sudo',
     [
@@ -26646,22 +26654,39 @@ function run() {
   core.saveState(VMMETER_PID, child.pid?.toString())
   console.log(`vmmeter pid: ${child.pid}`)
 
-  for( let i = 0; i < 100; i++ ) {
-    let out = false
+  let port = 0;
+
+  for(let i = 0; i < 100; i++) {
+    let found = false
     try {
       const data = fs.readFileSync('/tmp/vmmeter.port', 'utf8')
-      console.log(`Read port {data} from: /tmp/vmmeter.port`)
-      core.saveState(VMMETER_PORT, data.trim())
-      out = true
+      port = parseInt(data.trim())
+      found = true
     } catch {
 
     }
 
-    if(out) {
+    if(found) {
       break
     }
-    (0,external_child_process_namespaceObject.execSync)('sleep 0.1'); // block process for 1 second.
-    // add a 100ms sleep
+
+    (0,external_child_process_namespaceObject.execSync)('sleep 0.1'); // Wait for 100ms
+  }
+
+  if(port > 0) {
+    console.log(`vmmeter port: ${data}`)
+
+    core.saveState(VMMETER_PORT, data.trim())
+  } else {
+    core.warning("vmmeter port not found, process did not start correctly");
+
+    try {
+      let data = fs.readFileSync('/tmp/vmmeter.log', 'utf8')
+      core.warning(`Error starting vmmeter, logs: {data}`)
+    } catch {
+      core.warning(`No logs found in /tmp/vmmeter.log`);
+    }
+
   }
 }
 
