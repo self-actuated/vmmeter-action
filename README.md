@@ -19,3 +19,7 @@ The `alexellis/setup-arkade` action is required to install arkade, which is used
 ## Inputs via `with`:
 
 * `createSummary` - defaults to `true` and adds the results to the job summary, if set to false, the results will be printed to the console only.
+
+## License
+
+Licensed for free use by customers of OpenFaaS Ltd.
