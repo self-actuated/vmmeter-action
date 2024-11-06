@@ -24726,6 +24726,14 @@ module.exports = require("buffer");
 
 /***/ }),
 
+/***/ 2081:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("child_process");
+
+/***/ }),
+
 /***/ 6206:
 /***/ ((module) => {
 
@@ -26578,120 +26586,114 @@ module.exports = parseParams
 /******/ 	}
 /******/ 	
 /************************************************************************/
-/******/ 	/* webpack/runtime/make namespace object */
-/******/ 	(() => {
-/******/ 		// define __esModule on exports
-/******/ 		__nccwpck_require__.r = (exports) => {
-/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 			}
-/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 		};
-/******/ 	})();
-/******/ 	
 /******/ 	/* webpack/runtime/compat */
 /******/ 	
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be in strict mode.
+// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
-"use strict";
-// ESM COMPAT FLAG
-__nccwpck_require__.r(__webpack_exports__);
-
-;// CONCATENATED MODULE: external "child_process"
-const external_child_process_namespaceObject = require("child_process");
-;// CONCATENATED MODULE: ./index.js
 const core = __nccwpck_require__(2619);
-const fs = __nccwpck_require__(7147)
-;
+const fs = __nccwpck_require__(7147);
+const { execSync, spawn } = __nccwpck_require__(2081);
 
-const VMMETER_PID = 'vmmeter-pid'
-const VMMETER_PORT = 'vmmeter-port'
+const VMMETER_PID = 'vmmeter-pid';
+const VMMETER_PORT = 'vmmeter-port';
 
 function run() {
-
-  const time = (new Date()).toTimeString();
+  const time = new Date().toTimeString();
   core.setOutput("start-time", time);
 
-  // Fail if installation skipped
+  // Check if arkade is installed
+  try {
+    fs.accessSync('/usr/local/bin/arkade', fs.constants.X_OK);
+  } catch (err) {
+    core.setFailed("arkade not found in /usr/local/bin, please install it to proceed.");
+    return;
+  }
+
+  // Check if vmmeter is installed
   try {
     fs.accessSync('/usr/local/bin/vmmeter', fs.constants.X_OK);
   } catch (err) {
-    core.setFailed("vmmeter not found in /usr/local/bin, install via arkade");
-    return;
+    console.log("vmmeter not found. Attempting to install via arkade...");
+    
+    try {
+      execSync('sudo -E /usr/local/bin/arkade oci install ghcr.io/openfaasltd/vmmeter:latest --path /usr/local/bin/', { stdio: 'inherit' });
+    } catch (installErr) {
+      core.setFailed(`Failed to install vmmeter: ${installErr.message}`);
+      return;
+    }
+
+    // Re-check if vmmeter is installed after installation attempt
+    try {
+      fs.accessSync('/usr/local/bin/vmmeter', fs.constants.X_OK);
+    } catch (finalErr) {
+      core.setFailed("vmmeter installation failed, still not found in /usr/local/bin.");
+      return;
+    }
   }
-   
-  const child = (0,external_child_process_namespaceObject.spawn)(
+
+  // Start vmmeter as a detached process
+  const child = spawn(
     'sudo',
-    [
-      "/usr/local/bin/vmmeter",
-    ],
+    ['/usr/local/bin/vmmeter'],
     {
       detached: true,
       stdio: 'ignore',
-      env: {
-        ...process.env
-      }
+      env: { ...process.env }
     }
-  )
-  child.unref()
+  );
+  child.unref();
 
   if (child.pid === undefined) {
     core.warning("Unable to start vmmeter process");
 
     try {
-      let data = fs.readFileSync('/tmp/vmmeter.log', 'utf8')
-      core.warning(`Error starting vmmeter, logs: ${data}`)
+      let data = fs.readFileSync('/tmp/vmmeter.log', 'utf8');
+      core.warning(`Error starting vmmeter, logs: ${data}`);
     } catch {
-      core.warning(`No logs found in /tmp/vmmeter.log`);
+      core.warning("No logs found in /tmp/vmmeter.log");
     }
     return;
   }
 
-  core.saveState(VMMETER_PID, child.pid?.toString())
-  console.log(`vmmeter pid: ${child.pid}`)
+  core.saveState(VMMETER_PID, child.pid.toString());
+  console.log(`vmmeter pid: ${child.pid}`);
 
   let port = 0;
-
-  for(let i = 0; i < 100; i++) {
-    let found = false
+  for (let i = 0; i < 100; i++) {
+    let found = false;
     try {
-      const data = fs.readFileSync('/tmp/vmmeter.port', 'utf8')
-      port = parseInt(data.trim())
-      found = true
+      const data = fs.readFileSync('/tmp/vmmeter.port', 'utf8');
+      port = parseInt(data.trim());
+      found = true;
     } catch {
-
+      // Retry reading port file if not found
     }
 
-    if(found) {
-      break
-    }
-
-    (0,external_child_process_namespaceObject.execSync)('sleep 0.1'); // Wait for 100ms
+    if (found) break;
+    execSync('sleep 0.1'); // Wait for 100ms
   }
 
-  if(port > 0) {
-    console.log(`vmmeter port: ${port}`)
-
-    core.saveState(VMMETER_PORT, port)
+  if (port > 0) {
+    console.log(`vmmeter port: ${port}`);
+    core.saveState(VMMETER_PORT, port);
   } else {
     core.warning("vmmeter port not found, process did not start correctly");
 
     try {
-      let data = fs.readFileSync('/tmp/vmmeter.log', 'utf8')
-      core.warning(`Error starting vmmeter, logs: ${data}`)
+      let data = fs.readFileSync('/tmp/vmmeter.log', 'utf8');
+      core.warning(`Error starting vmmeter, logs: ${data}`);
     } catch {
-      core.warning(`No logs found in /tmp/vmmeter.log`);
+      core.warning("No logs found in /tmp/vmmeter.log");
     }
-
   }
 }
 
 try {
-  run()
+  run();
 } catch (error) {
   core.setFailed(error.message);
 }
