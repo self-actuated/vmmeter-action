@@ -13,10 +13,11 @@ async function run() {
     let vmPort = core.getState('vmmeter-port')
   
     if(vmPort == '') {
-      throw new Error("vmmeter port not found")
+      core.warning("vmmeter port not found");
+      return;
     }
   
-    let results = ""
+    let results = "Results not available"
     await axios({"method": "get", "url": `http://127.0.0.1:${vmPort}/collect`, "headers": {}}).
     then((response) => {
       console.log(response.data)
@@ -28,13 +29,13 @@ async function run() {
         let data = fs.readFileSync('/tmp/vmmeter.log', 'utf8')
         console.error(data)
         console.log(err)
-        core.setFailed(`Failed to collect metrics: ${err.message}, logs: ${data}`);
+        core.warning(`Failed to collect metrics: ${err.message}, logs: ${data}`);
       } catch {
-        core.setFailed(`Failed to collect metrics: ${err.message}, logs: (can't read from /tmp/vmmeter.log)`);
+        core.warning(`Failed to collect metrics: ${err.message}, logs: (can't read from /tmp/vmmeter.log)`);
       }
     })
   
-    if(core.getBooleanInput("createSummary")){
+    if(core.getBooleanInput("createSummary")) {
   
       await core.summary
       .addHeading('Metering Results')
@@ -43,7 +44,7 @@ async function run() {
     }
    
   } catch (error) {
-    core.setFailed(error.message);
+    core.warning(error.message);
   }
   
 }
